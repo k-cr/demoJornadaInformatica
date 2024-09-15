@@ -1,11 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jornada de Informática</title>
+    <title>Administrador de Materias</title>
+    <link rel="stylesheet" href="styles/styles.css">
 </head>
-    <body>
-        
-    </body>
+<body>
+    <div class="container">
+        <h1>Administrador de Materias</h1>
+
+        <!-- Sección de Autenticación -->
+        <div id="auth-section">
+            <h2>Iniciar sesión</h2>
+            <form id="login-form">
+                <input type="email" id="email" placeholder="Correo electrónico" required>
+                <input type="password" id="password" placeholder="Contraseña" required>
+                <button type="submit">Iniciar Sesión</button>
+            </form>
+            <button id="register-btn">Registrarse</button>
+            <button id="logout-btn" style="display: none;">Cerrar Sesión</button>
+        </div>
+
+        <!-- Sección de Materias -->
+        <div id="materias-section" style="display: none;">
+            <h2>Materias</h2>
+            <form id="materia-form">
+                <input type="text" id="materia-nombre" placeholder="Nombre de la materia" required>
+                <button type="submit">Agregar Materia</button>
+            </form>
+            <ul id="materias-list"></ul>
+        </div>
+
+        <!-- Gestor de Archivos -->
+        <div id="archivo-section" style="display: none;">
+            <h2>Subir Archivos</h2>
+            <form id="archivo-form">
+                <input type="file" id="archivo" required>
+                <button type="submit">Subir Archivo</button>
+            </form>
+            <ul id="archivos-list"></ul>
+        </div>
+    </div>
+
+    <!-- Firebase config -->
+    <script src="js/firebaseConfig.js"></script>
+    <script src="js/main.js"></script>
+</body>
 </html>

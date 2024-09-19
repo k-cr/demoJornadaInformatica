@@ -1,5 +1,7 @@
 // js/main.js
+
 import { db, auth, storage } from './firebaseConfig.js';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js';
 
 // Manejo de la autenticación
 const loginForm = document.getElementById('login-form');
@@ -14,7 +16,7 @@ loginForm.addEventListener('submit', async (e) => {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     try {
-        await auth.signInWithEmailAndPassword(email, password);
+        await signInWithEmailAndPassword(auth, email, password);
         loginForm.reset();
     } catch (error) {
         console.error("Error en inicio de sesión:", error);
@@ -25,7 +27,7 @@ registerBtn.addEventListener('click', async () => {
     const email = prompt("Correo:");
     const password = prompt("Contraseña:");
     try {
-        await auth.createUserWithEmailAndPassword(email, password);
+        await createUserWithEmailAndPassword(auth, email, password);
     } catch (error) {
         console.error("Error en registro:", error);
     }
@@ -33,21 +35,22 @@ registerBtn.addEventListener('click', async () => {
 
 logoutBtn.addEventListener('click', async () => {
     try {
-        await auth.signOut();
+        await signOut(auth);
     } catch (error) {
         console.error("Error al cerrar sesión:", error);
     }
 });
 
-// Cambio de estado de autenticación
-auth.onAuthStateChanged((user) => {
+onAuthStateChanged(auth, (user) => {
     if (user) {
         authSection.style.display = 'none';
+        logoutBtn.style.display = 'block';
         materiasSection.style.display = 'block';
         archivoSection.style.display = 'block';
         mostrarMaterias();
     } else {
         authSection.style.display = 'block';
+        logoutBtn.style.display = 'none';
         materiasSection.style.display = 'none';
         archivoSection.style.display = 'none';
     }
@@ -89,13 +92,12 @@ archivoForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const archivo = archivoInput.files[0];
     const materiaId = prompt("ID de la materia:");
-    
+
     const storageRef = storage.ref(`materias/${materiaId}/${archivo.name}`);
     try {
         const snapshot = await storageRef.put(archivo);
         const url = await snapshot.ref.getDownloadURL();
 
-        // Guardar la URL del archivo en Firestore
         const materiaRef = db.collection("materias").doc(materiaId);
         await materiaRef.update({
             archivos: firebase.firestore.FieldValue.arrayUnion(url)

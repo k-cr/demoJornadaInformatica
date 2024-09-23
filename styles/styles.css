@@ -1,66 +1,82 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
-  
-  .container {
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    max-width: 500px;
-    width: 100%;
-  }
-  
-  h1, h2 {
-    margin-bottom: 15px;
-    text-align: center;
-  }
-  
-  input {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  
-  button {
-    width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-  
-  button + button {
-    margin-top: 10px;
-  }
-  
-  .form-group {
-    margin-bottom: 20px;
-  }
-  
-  #materias-list {
-    margin-top: 20px;
-    border-top: 1px solid #ccc;
-    padding-top: 10px;
-  }
-  
+/* Fondo principal */
+body {
+  background-color: #f8f9fa;
+}
+
+/* Estilo general para las cartas */
+.card {
+  border-radius: 12px;
+}
+
+/* Transiciones suaves para hover en listas */
+.list-group-item {
+  transition: background-color 0.3s ease;
+}
+
+.list-group-item:hover {
+  background-color: #f1f1f1;
+  cursor: pointer;
+}
+
+/* Para el formulario de login */
+#auth-section .card {
+  border-radius: 10px;
+}
+
+#auth-section .btn {
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+#auth-section .btn-primary {
+  background-color: #0069d9;
+  border-color: #0062cc;
+}
+
+#auth-section .btn-primary:hover {
+  background-color: #0056b3;
+}
+
+#auth-section .btn-outline-primary:hover {
+  background-color: #0062cc;
+  color: #fff;
+}
+
+/* Header de cada sección */
+h1, h2, h5 {
+  font-weight: 500;
+  color: #333;
+}
+
+.display-6 {
+  font-size: 1.75rem;
+}
+
+/* Ajustes para botones */
+.btn {
+  border-radius: 8px;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+/* Ocultar el scrollbar en listas */
+#materias-list, #archivos-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+#materias-list::-webkit-scrollbar,
+#archivos-list::-webkit-scrollbar {
+  display: none;
+}
+
+.list-group-item {
+  border: none;
+  padding: 15px 20px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.05);
+}

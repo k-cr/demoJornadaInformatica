@@ -1,28 +1,49 @@
-// js/main.js
-
-import { db, auth, storage } from './firebaseConfig.js';
+import { app, auth, storage } from './firebaseConfig.js';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js';
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
 
-// Manejo de la autenticación
+const db = getFirestore(app);
+
+// Referencias a los elementos del DOM
 const loginForm = document.getElementById('login-form');
 const registerBtn = document.getElementById('register-btn');
 const logoutBtn = document.getElementById('logout-btn');
 const authSection = document.getElementById('auth-section');
-const materiasSection = document.getElementById('materias-section');
+const dashboardSection = document.getElementById('dashboard-section');
+const materiasList = document.getElementById('materias-list');
 const archivoSection = document.getElementById('archivo-section');
+const archivosList = document.getElementById('archivos-list');
+const backToDashboardBtn = document.getElementById('back-to-dashboard');
+const materiaTitle = document.getElementById('materia-title');
 
-loginForm.addEventListener('submit', async (e) => {
+
+// Escuchar el envío del formulario de login
+document.getElementById('login-form').addEventListener('submit', async function (e) {
     e.preventDefault();
+
+    // Obtener los valores de los inputs
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
+
     try {
-        await signInWithEmailAndPassword(auth, email, password);
-        loginForm.reset();
+        // Autenticación con Firebase (ajusta esto a tu configuración si ya la tienes)
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Mostrar el dashboard y ocultar el formulario de autenticación
+        document.getElementById('auth-section').style.display = 'none';
+        document.getElementById('dashboard-section').style.display = 'block';
+
+        // console.log('Usuario autenticado:', user.email);
+        // Aquí puedes cargar las materias del usuario o cualquier lógica adicional que tengas
+
     } catch (error) {
-        console.error("Error en inicio de sesión:", error);
+        console.error('Error en el inicio de sesión:', error.message);
+        alert('Hubo un problema al iniciar sesión: ' + error.message);
     }
 });
 
+// Registrarse
 registerBtn.addEventListener('click', async () => {
     const email = prompt("Correo:");
     const password = prompt("Contraseña:");
@@ -33,6 +54,7 @@ registerBtn.addEventListener('click', async () => {
     }
 });
 
+// Cerrar sesión
 logoutBtn.addEventListener('click', async () => {
     try {
         await signOut(auth);
@@ -41,74 +63,52 @@ logoutBtn.addEventListener('click', async () => {
     }
 });
 
+// Monitorear cambios en el estado de autenticación
 onAuthStateChanged(auth, (user) => {
     if (user) {
         authSection.style.display = 'none';
-        logoutBtn.style.display = 'block';
-        materiasSection.style.display = 'block';
-        archivoSection.style.display = 'block';
+        dashboardSection.style.display = 'block';
         mostrarMaterias();
     } else {
         authSection.style.display = 'block';
-        logoutBtn.style.display = 'none';
-        materiasSection.style.display = 'none';
+        dashboardSection.style.display = 'none';
         archivoSection.style.display = 'none';
     }
 });
 
-// Manejo de las materias
-const materiaForm = document.getElementById('materia-form');
-const materiasList = document.getElementById('materias-list');
-
-materiaForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const nombre = document.getElementById('materia-nombre').value;
-    try {
-        await db.collection("materias").add({ nombre });
-        materiaForm.reset();
-        mostrarMaterias();
-    } catch (error) {
-        console.error("Error al agregar materia:", error);
-    }
-});
-
+// Mostrar materias en el dashboard
 async function mostrarMaterias() {
     materiasList.innerHTML = '';
-    const querySnapshot = await db.collection("materias").get();
+    const querySnapshot = await getDocs(collection(db, "materias"));
     querySnapshot.forEach((doc) => {
         const materia = doc.data();
         const li = document.createElement('li');
         li.textContent = materia.nombre;
+        li.addEventListener('click', () => mostrarArchivos(doc.id, materia.nombre));
         materiasList.appendChild(li);
     });
 }
 
-// Manejo de archivos
-const archivoForm = document.getElementById('archivo-form');
-const archivoInput = document.getElementById('archivo');
-const archivosList = document.getElementById('archivos-list');
+// Mostrar archivos de una materia
+async function mostrarArchivos(materiaId, nombreMateria) {
+    dashboardSection.style.display = 'none';
+    archivoSection.style.display = 'block';
+    materiaTitle.textContent = nombreMateria;
 
-archivoForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const archivo = archivoInput.files[0];
-    const materiaId = prompt("ID de la materia:");
+    archivosList.innerHTML = '';
+    const materiaRef = doc(db, "materias", materiaId);
+    const materiaSnap = await materiaRef.get();
 
-    const storageRef = storage.ref(`materias/${materiaId}/${archivo.name}`);
-    try {
-        const snapshot = await storageRef.put(archivo);
-        const url = await snapshot.ref.getDownloadURL();
-
-        const materiaRef = db.collection("materias").doc(materiaId);
-        await materiaRef.update({
-            archivos: firebase.firestore.FieldValue.arrayUnion(url)
-        });
-
+    const archivos = materiaSnap.data().archivos || [];
+    archivos.forEach((archivo) => {
         const li = document.createElement('li');
-        li.textContent = `${archivo.name} - ${url}`;
+        li.textContent = archivo;
         archivosList.appendChild(li);
+    });
+}
 
-        archivoForm.reset();
-    } catch (error) {
-        console.error("Error al subir archivo:", error);
-    }
+// Volver al dashboard
+backToDashboardBtn.addEventListener('click', () => {
+    archivoSection.style.display = 'none';
+    dashboardSection.style.display = 'block';
 });

@@ -84,10 +84,14 @@ logoutBtn.addEventListener('click', async () => {
 // Monitorear cambios en el estado de autenticación
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        authSection.style.display = 'none';
+        // authSection.style.display = 'none';
+        authSection.classList.remove("d-flex")
+        authSection.classList.add("d-none")
         dashboardSection.style.display = 'block';
         mostrarMaterias();
     } else {
+        authSection.classList.remove("d-none")
+        authSection.classList.add("d-flex")
         authSection.style.display = 'block';
         dashboardSection.style.display = 'none';
         archivoSection.style.display = 'none';
